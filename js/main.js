@@ -47,29 +47,29 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             num: '01',
             badge: 'Danza & Salón de Espejos',
-            title: '<i class="fas fa-wand-magic-sparkles"></i> Danza, Expresión Corporal & Salón de Espejos',
-            desc: 'Un espacio luminoso de contención y sensibilidad artística en Escobar, donde niñas, niños y jóvenes desarrollan postura, musicalidad y gracia en cada clase.',
+            title: '<i class="fas fa-wand-magic-sparkles"></i> Danza, Expresión Corporal & Espejos',
+            desc: 'Un espacio de contención y sensibilidad artística en Escobar, donde niñas, niños y jóvenes desarrollan técnica, postura y musicalidad.',
             img: 'images/local/local-1.jpg'
         },
         {
             num: '02',
             badge: 'Acrobacia en Tela & Expresión',
             title: '<i class="fas fa-wind"></i> Acrobacia en Tela, Danza Aérea & Teatro',
-            desc: 'Fuerza, plasticidad y libertad en altura. Clases cuidadas con colchonetas de seguridad donde se fusiona la expresión escénica con la destreza acrobática.',
+            desc: 'Fuerza, plasticidad y libertad en altura. Clases cuidadas con colchonetas de seguridad fusionando acrobacia con expresión escénica.',
             img: 'images/local/local-2.jpg'
         },
         {
             num: '03',
             badge: 'Gimnasia Artística',
-            title: '<i class="fas fa-ribbon"></i> Gimnasia Artística Formativa en Suelo, Viga y Salto',
-            desc: 'Más de 15 años siendo referentes en Belén de Escobar. Coordinación, flexibilidad, equilibrio y superación personal para grupos desde los 3 años.',
+            title: '<i class="fas fa-ribbon"></i> Gimnasia Artística en Suelo, Viga y Salto',
+            desc: 'Referentes con trayectoria en Belén de Escobar. Coordinación, flexibilidad, equilibrio y superación personal para grupos desde los 3 años.',
             img: 'images/local/local-3.jpg'
         },
         {
             num: '04',
-            badge: 'Galas, Encuentros & Valores',
-            title: '<i class="fas fa-heart"></i> Galas Anuales, Torneos Regionales y Educación en Valores',
-            desc: 'Una gran familia donde cada logro se celebra en equipo. Trabajamos las emociones, el compañerismo y la confianza tanto en el salón como en cada torneo.',
+            badge: 'Galas, Torneos & Valores',
+            title: '<i class="fas fa-heart"></i> Galas Anuales, Torneos & Educación en Valores',
+            desc: 'Una gran familia donde cada logro se celebra en equipo. Desarrollamos compañerismo, confianza y contención en cada encuentro y torneo.',
             img: 'images/local/local-4.jpg'
         }
     ];

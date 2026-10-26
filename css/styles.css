@@ -1351,42 +1351,103 @@ img {
 }
 
 /* ==========================================================================
-   OPINIONES DE LAS FAMILIAS EN GOOGLE MAPS (5.0 ★)
+   OPINIONES DE LAS FAMILIAS EN GOOGLE MAPS (5.0 ★ - CARRUSEL INFINITO SOFT)
    ========================================================================== */
 .reviews-section {
-    padding: 6rem 5%;
+    padding: 5.5rem 0 5rem;
     background: var(--bg-Silk);
+    overflow: hidden;
+    position: relative;
+}
+
+.reviews-header-wrap {
+    padding: 0 5%;
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.reviews-marquee-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+}
+
+.reviews-marquee-wrapper::before,
+.reviews-marquee-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.reviews-marquee-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-Silk), rgba(254, 250, 251, 0));
+}
+
+.reviews-marquee-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-Silk), rgba(254, 250, 251, 0));
 }
 
 .reviews-strip {
     display: flex;
-    gap: 1.8rem;
+    gap: 1.25rem;
     overflow-x: auto;
-    padding: 1rem 0.5rem 2rem;
-    scroll-behavior: smooth;
+    overflow-y: hidden;
+    padding: 0.85rem 1.5rem 1.85rem;
+    scroll-behavior: auto !important;
     scrollbar-width: none;
+    -ms-overflow-style: none;
     cursor: grab;
+    user-select: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
+}
+
+.reviews-strip:active {
+    cursor: grabbing;
 }
 
 .reviews-strip::-webkit-scrollbar {
     display: none;
+    width: 0;
+    height: 0;
 }
 
 .review-frame {
-    min-width: 330px;
-    max-width: 375px;
+    width: 295px;
+    min-width: 295px;
+    max-width: 295px;
+    aspect-ratio: 560 / 290;
     flex-shrink: 0;
     background: #fff;
     border-radius: 16px;
-    border: 1.5px solid var(--primary);
+    border: 1.5px solid var(--border-pastel);
     overflow: hidden;
     box-shadow: var(--shadow-soft);
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .review-frame:hover {
-    transform: translateY(-7px);
+    transform: translateY(-6px);
     box-shadow: var(--shadow-elevated);
+    border-color: var(--primary);
+}
+
+.review-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
 }
 
 /* ==========================================================================
@@ -1835,9 +1896,46 @@ img {
         text-align: center;
         gap: 0.5rem;
     }
+
+    .reviews-section {
+        padding: 3.8rem 0 3.2rem;
+    }
+
+    .reviews-header-wrap {
+        padding: 0 4.5%;
+    }
+
+    .reviews-marquee-wrapper::before,
+    .reviews-marquee-wrapper::after {
+        width: 24px;
+    }
+
+    .reviews-strip {
+        gap: 0.95rem;
+        padding: 0.6rem 1rem 1.35rem;
+    }
+
+    .review-frame {
+        width: 265px;
+        min-width: 265px;
+        max-width: 265px;
+        border-radius: 14px;
+    }
 }
 
 @media (max-width: 480px) {
+    .reviews-marquee-wrapper::before,
+    .reviews-marquee-wrapper::after {
+        display: none;
+    }
+
+    .review-frame {
+        width: 245px;
+        min-width: 245px;
+        max-width: 245px;
+        border-radius: 13px;
+    }
+
     .hero-dynamic-caption {
         min-height: 152px;
         padding: 0.85rem 1rem;

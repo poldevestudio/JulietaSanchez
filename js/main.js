@@ -203,9 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ----------------------------------------------------------------------
-       4. CARRUSELES DRAG & FLECHAS (DISCIPLINAS Y RESEÑAS)
+       4. CARRUSEL DRAG & FLECHAS (PILARES DE ENSEÑANZA)
        ---------------------------------------------------------------------- */
-    const strips = document.querySelectorAll('.brands-scroll-strip, .reviews-strip');
+    const strips = document.querySelectorAll('.brands-scroll-strip');
     strips.forEach(strip => {
         let isDown = false;
         let startX;
@@ -239,6 +239,164 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+
+    /* ----------------------------------------------------------------------
+       4.1 CARRUSEL CONTINUO INFINITO DE RESEÑAS (AUTO-SCROLL SUAVE & TOUCH DRAG)
+       ---------------------------------------------------------------------- */
+    const reviewsStrip = document.getElementById('reviewsCarousel');
+    if (reviewsStrip) {
+        // Clonamos las tarjetas 2 veces para tener 3 sets continuos e ininterrumpibles
+        const originalCards = Array.from(reviewsStrip.children);
+        originalCards.forEach(card => reviewsStrip.appendChild(card.cloneNode(true)));
+        originalCards.forEach(card => reviewsStrip.appendChild(card.cloneNode(true)));
+
+        let setWidth = 0;
+        function updateSetWidth() {
+            setWidth = reviewsStrip.scrollWidth / 3;
+        }
+
+        updateSetWidth();
+        // Inicializar en el set central
+        if (reviewsStrip.scrollLeft === 0 && setWidth > 0) {
+            reviewsStrip.scrollLeft = setWidth;
+        }
+
+        window.addEventListener('resize', updateSetWidth);
+        window.addEventListener('load', () => {
+            updateSetWidth();
+            if (reviewsStrip.scrollLeft === 0 && setWidth > 0) {
+                reviewsStrip.scrollLeft = setWidth;
+            }
+        });
+
+        function checkLoopBounds() {
+            if (setWidth <= 0) return;
+            if (reviewsStrip.scrollLeft >= setWidth * 2) {
+                reviewsStrip.scrollLeft -= setWidth;
+            } else if (reviewsStrip.scrollLeft <= 0) {
+                reviewsStrip.scrollLeft += setWidth;
+            }
+        }
+
+        let isPaused = false;
+        let isTouching = false;
+        let isMouseDown = false;
+        let resumeTimer = null;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let scrollStartX = 0;
+        let isHorizontalSwipe = null;
+        let mouseStartX = 0;
+        let mouseScrollStart = 0;
+
+        function scheduleResume(delay = 1400) {
+            if (resumeTimer) clearTimeout(resumeTimer);
+            resumeTimer = setTimeout(() => {
+                if (!isTouching && !isMouseDown) {
+                    isPaused = false;
+                }
+            }, delay);
+        }
+
+        // Auto-scroll continuo suave de derecha a izquierda (~30px por segundo)
+        let lastTimestamp = null;
+        const scrollSpeedPxPerSec = 30;
+
+        function autoScrollLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const deltaSec = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
+            lastTimestamp = timestamp;
+
+            if (!isPaused && !isTouching && !isMouseDown) {
+                reviewsStrip.scrollLeft += (scrollSpeedPxPerSec * deltaSec);
+                checkLoopBounds();
+            }
+
+            requestAnimationFrame(autoScrollLoop);
+        }
+        requestAnimationFrame(autoScrollLoop);
+
+        // Pausa al pasar el cursor por encima (Desktop)
+        reviewsStrip.addEventListener('mouseenter', () => {
+            isPaused = true;
+            if (resumeTimer) clearTimeout(resumeTimer);
+        });
+
+        reviewsStrip.addEventListener('mouseleave', () => {
+            if (!isMouseDown) {
+                scheduleResume(400);
+            }
+        });
+
+        // Soporte táctil fluido en celulares ("con el dedo se pueda parar/mover")
+        reviewsStrip.addEventListener('touchstart', (e) => {
+            isTouching = true;
+            isPaused = true;
+            if (resumeTimer) clearTimeout(resumeTimer);
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            scrollStartX = reviewsStrip.scrollLeft;
+            isHorizontalSwipe = null;
+        }, { passive: true });
+
+        reviewsStrip.addEventListener('touchmove', (e) => {
+            if (!isTouching) return;
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = Math.abs(currentX - touchStartX);
+            const diffY = Math.abs(currentY - touchStartY);
+
+            if (isHorizontalSwipe === null && (diffX > 6 || diffY > 6)) {
+                isHorizontalSwipe = diffX > diffY;
+            }
+
+            if (isHorizontalSwipe) {
+                if (e.cancelable) e.preventDefault();
+                const delta = currentX - touchStartX;
+                reviewsStrip.scrollLeft = scrollStartX - delta;
+                checkLoopBounds();
+            }
+        }, { passive: false });
+
+        reviewsStrip.addEventListener('touchend', () => {
+            isTouching = false;
+            isHorizontalSwipe = null;
+            scheduleResume(1400);
+        }, { passive: true });
+
+        reviewsStrip.addEventListener('touchcancel', () => {
+            isTouching = false;
+            isHorizontalSwipe = null;
+            scheduleResume(1400);
+        }, { passive: true });
+
+        // Arrastre con mouse en desktop
+        reviewsStrip.addEventListener('mousedown', (e) => {
+            isMouseDown = true;
+            isPaused = true;
+            if (resumeTimer) clearTimeout(resumeTimer);
+            mouseStartX = e.pageX - reviewsStrip.offsetLeft;
+            mouseScrollStart = reviewsStrip.scrollLeft;
+            reviewsStrip.style.cursor = 'grabbing';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            e.preventDefault();
+            const x = e.pageX - reviewsStrip.offsetLeft;
+            const walk = (x - mouseStartX) * 1.3;
+            reviewsStrip.scrollLeft = mouseScrollStart - walk;
+            checkLoopBounds();
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (isMouseDown) {
+                isMouseDown = false;
+                reviewsStrip.style.cursor = 'grab';
+                scheduleResume(1200);
+            }
+        });
+    }
 
     /* ----------------------------------------------------------------------
        5. DETECTOR DEL DÍA ACTUAL EN LA TABLA DE HORARIOS

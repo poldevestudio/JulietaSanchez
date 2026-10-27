@@ -203,78 +203,43 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* ----------------------------------------------------------------------
-       4. CARRUSEL DRAG & FLECHAS (PILARES DE ENSEÑANZA)
+       4. MOTOR DE CARRUSELES CONTINUOS INFINITOS (PILARES Y RESEÑAS)
        ---------------------------------------------------------------------- */
-    const strips = document.querySelectorAll('.brands-scroll-strip');
-    strips.forEach(strip => {
-        let isDown = false;
-        let startX;
-        let scrollLeft;
+    function initInfiniteMarquee(stripId, options = {}) {
+        const strip = document.getElementById(stripId);
+        if (!strip) return;
 
-        strip.addEventListener('mousedown', (e) => {
-            isDown = true;
-            startX = e.pageX - strip.offsetLeft;
-            scrollLeft = strip.scrollLeft;
-        });
-        strip.addEventListener('mouseleave', () => { isDown = false; });
-        strip.addEventListener('mouseup', () => { isDown = false; });
-        strip.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - strip.offsetLeft;
-            const walk = (x - startX) * 1.8;
-            strip.scrollLeft = scrollLeft - walk;
-        });
-    });
+        const speed = options.speed || 30; // px por segundo
 
-    document.querySelectorAll('.strip-arrow').forEach(arrow => {
-        arrow.addEventListener('click', () => {
-            const targetId = arrow.getAttribute('data-target');
-            const container = document.getElementById(targetId);
-            if (!container) return;
-            const amount = container.clientWidth * 0.7;
-            container.scrollBy({
-                left: arrow.classList.contains('prev') ? -amount : amount,
-                behavior: 'smooth'
-            });
-        });
-    });
-
-    /* ----------------------------------------------------------------------
-       4.1 CARRUSEL CONTINUO INFINITO DE RESEÑAS (AUTO-SCROLL SUAVE & TOUCH DRAG)
-       ---------------------------------------------------------------------- */
-    const reviewsStrip = document.getElementById('reviewsCarousel');
-    if (reviewsStrip) {
         // Clonamos las tarjetas 2 veces para tener 3 sets continuos e ininterrumpibles
-        const originalCards = Array.from(reviewsStrip.children);
-        originalCards.forEach(card => reviewsStrip.appendChild(card.cloneNode(true)));
-        originalCards.forEach(card => reviewsStrip.appendChild(card.cloneNode(true)));
+        const originalCards = Array.from(strip.children);
+        originalCards.forEach(card => strip.appendChild(card.cloneNode(true)));
+        originalCards.forEach(card => strip.appendChild(card.cloneNode(true)));
 
         let setWidth = 0;
         function updateSetWidth() {
-            setWidth = reviewsStrip.scrollWidth / 3;
+            setWidth = strip.scrollWidth / 3;
         }
 
         updateSetWidth();
-        // Inicializar en el set central
-        if (reviewsStrip.scrollLeft === 0 && setWidth > 0) {
-            reviewsStrip.scrollLeft = setWidth;
+        if (strip.scrollLeft === 0 && setWidth > 0) {
+            strip.scrollLeft = setWidth;
         }
 
         window.addEventListener('resize', updateSetWidth);
         window.addEventListener('load', () => {
             updateSetWidth();
-            if (reviewsStrip.scrollLeft === 0 && setWidth > 0) {
-                reviewsStrip.scrollLeft = setWidth;
+            if (strip.scrollLeft === 0 && setWidth > 0) {
+                strip.scrollLeft = setWidth;
             }
         });
 
         function checkLoopBounds() {
             if (setWidth <= 0) return;
-            if (reviewsStrip.scrollLeft >= setWidth * 2) {
-                reviewsStrip.scrollLeft -= setWidth;
-            } else if (reviewsStrip.scrollLeft <= 0) {
-                reviewsStrip.scrollLeft += setWidth;
+            if (strip.scrollLeft >= setWidth * 2) {
+                strip.scrollLeft -= setWidth;
+            } else if (strip.scrollLeft <= 0) {
+                strip.scrollLeft += setWidth;
             }
         }
 
@@ -298,17 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }, delay);
         }
 
-        // Auto-scroll continuo suave de derecha a izquierda (~30px por segundo)
+        // Auto-scroll continuo suave a 60fps con requestAnimationFrame
         let lastTimestamp = null;
-        const scrollSpeedPxPerSec = 30;
-
         function autoScrollLoop(timestamp) {
             if (!lastTimestamp) lastTimestamp = timestamp;
             const deltaSec = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
             lastTimestamp = timestamp;
 
             if (!isPaused && !isTouching && !isMouseDown) {
-                reviewsStrip.scrollLeft += (scrollSpeedPxPerSec * deltaSec);
+                strip.scrollLeft += (speed * deltaSec);
                 checkLoopBounds();
             }
 
@@ -317,29 +280,29 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(autoScrollLoop);
 
         // Pausa al pasar el cursor por encima (Desktop)
-        reviewsStrip.addEventListener('mouseenter', () => {
+        strip.addEventListener('mouseenter', () => {
             isPaused = true;
             if (resumeTimer) clearTimeout(resumeTimer);
         });
 
-        reviewsStrip.addEventListener('mouseleave', () => {
+        strip.addEventListener('mouseleave', () => {
             if (!isMouseDown) {
                 scheduleResume(400);
             }
         });
 
         // Soporte táctil fluido en celulares ("con el dedo se pueda parar/mover")
-        reviewsStrip.addEventListener('touchstart', (e) => {
+        strip.addEventListener('touchstart', (e) => {
             isTouching = true;
             isPaused = true;
             if (resumeTimer) clearTimeout(resumeTimer);
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
-            scrollStartX = reviewsStrip.scrollLeft;
+            scrollStartX = strip.scrollLeft;
             isHorizontalSwipe = null;
         }, { passive: true });
 
-        reviewsStrip.addEventListener('touchmove', (e) => {
+        strip.addEventListener('touchmove', (e) => {
             if (!isTouching) return;
             const currentX = e.touches[0].clientX;
             const currentY = e.touches[0].clientY;
@@ -353,50 +316,54 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isHorizontalSwipe) {
                 if (e.cancelable) e.preventDefault();
                 const delta = currentX - touchStartX;
-                reviewsStrip.scrollLeft = scrollStartX - delta;
+                strip.scrollLeft = scrollStartX - delta;
                 checkLoopBounds();
             }
         }, { passive: false });
 
-        reviewsStrip.addEventListener('touchend', () => {
+        strip.addEventListener('touchend', () => {
             isTouching = false;
             isHorizontalSwipe = null;
             scheduleResume(1400);
         }, { passive: true });
 
-        reviewsStrip.addEventListener('touchcancel', () => {
+        strip.addEventListener('touchcancel', () => {
             isTouching = false;
             isHorizontalSwipe = null;
             scheduleResume(1400);
         }, { passive: true });
 
         // Arrastre con mouse en desktop
-        reviewsStrip.addEventListener('mousedown', (e) => {
+        strip.addEventListener('mousedown', (e) => {
             isMouseDown = true;
             isPaused = true;
             if (resumeTimer) clearTimeout(resumeTimer);
-            mouseStartX = e.pageX - reviewsStrip.offsetLeft;
-            mouseScrollStart = reviewsStrip.scrollLeft;
-            reviewsStrip.style.cursor = 'grabbing';
+            mouseStartX = e.pageX - strip.offsetLeft;
+            mouseScrollStart = strip.scrollLeft;
+            strip.style.cursor = 'grabbing';
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isMouseDown) return;
             e.preventDefault();
-            const x = e.pageX - reviewsStrip.offsetLeft;
+            const x = e.pageX - strip.offsetLeft;
             const walk = (x - mouseStartX) * 1.3;
-            reviewsStrip.scrollLeft = mouseScrollStart - walk;
+            strip.scrollLeft = mouseScrollStart - walk;
             checkLoopBounds();
         });
 
         window.addEventListener('mouseup', () => {
             if (isMouseDown) {
                 isMouseDown = false;
-                reviewsStrip.style.cursor = 'grab';
+                strip.style.cursor = 'grab';
                 scheduleResume(1200);
             }
         });
     }
+
+    // Inicializar ambos carruseles continuos de derecha a izquierda
+    initInfiniteMarquee('brandsCarousel', { speed: 30 });
+    initInfiniteMarquee('reviewsCarousel', { speed: 28 });
 
     /* ----------------------------------------------------------------------
        5. DETECTOR DEL DÍA ACTUAL EN LA TABLA DE HORARIOS

@@ -1202,18 +1202,22 @@ img {
 }
 
 /* ==========================================================================
-   TIRA INTERACTIVA DE DISCIPLINAS Y PILARES FORMATIVOS
+   TIRA INTERACTIVA DE DISCIPLINAS Y PILARES FORMATIVOS (CARRUSEL INFINITO SOFT)
    ========================================================================== */
 .brands-kinetic-section {
-    padding: 4.5rem 0;
+    padding: 5rem 0 4.5rem;
     background: var(--bg-white);
     overflow: hidden;
+    position: relative;
 }
 
 .brands-title-center {
     text-align: center;
-    margin-bottom: 2.2rem;
+    margin-bottom: 2rem;
     padding: 0 5%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .brands-title-center span.sub {
@@ -1231,85 +1235,92 @@ img {
     font-size: clamp(1.9rem, 3.2vw, 2.75rem);
 }
 
-.brands-track-wrapper {
+.brands-marquee-wrapper {
     position: relative;
-    max-width: 1320px;
-    margin: 0 auto;
-    padding: 0 54px;
-    display: flex;
-    align-items: center;
+    width: 100%;
+    overflow: hidden;
+    padding: 0;
+}
+
+.brands-marquee-wrapper::before,
+.brands-marquee-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.brands-marquee-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+}
+
+.brands-marquee-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, #fff, rgba(255, 255, 255, 0));
 }
 
 .brands-scroll-strip {
     display: flex;
-    gap: 1.4rem;
+    gap: 1.15rem;
     overflow-x: auto;
-    padding: 1rem 0.5rem;
-    scroll-behavior: smooth;
+    overflow-y: hidden;
+    padding: 0.85rem 1.5rem 1.85rem;
+    scroll-behavior: auto !important;
     scrollbar-width: none;
+    -ms-overflow-style: none;
     cursor: grab;
+    user-select: none;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
+}
+
+.brands-scroll-strip:active {
+    cursor: grabbing;
 }
 
 .brands-scroll-strip::-webkit-scrollbar {
     display: none;
+    width: 0;
+    height: 0;
 }
 
 .brand-glass-card {
-    width: 230px;
-    height: 122px;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    aspect-ratio: 320 / 165;
     flex-shrink: 0;
     background: var(--bg-Silk);
     border: 1px solid var(--border-pastel);
-    border-radius: 18px;
-    padding: 6px;
+    border-radius: 16px;
+    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 20px rgba(140, 66, 83, 0.06);
-    transition: all 0.35s var(--transition-bounce);
+    box-shadow: 0 6px 16px rgba(140, 66, 83, 0.05);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    box-sizing: border-box;
 }
 
 .brand-glass-card:hover {
-    transform: translateY(-6px) scale(1.04);
+    transform: translateY(-5px) scale(1.03);
     background: #fff;
     border-color: var(--primary-strong);
-    box-shadow: 0 14px 28px rgba(184, 102, 120, 0.16);
+    box-shadow: 0 12px 24px rgba(184, 102, 120, 0.14);
 }
 
 .brand-glass-card img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
 }
-
-.strip-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #fff;
-    border: 1.5px solid var(--primary);
-    color: var(--primary-strong);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    box-shadow: 0 6px 16px rgba(140, 66, 83, 0.12);
-    transition: all 0.3s ease;
-}
-
-.strip-arrow:hover {
-    background: var(--primary-strong);
-    border-color: var(--primary-strong);
-    color: #fff;
-    transform: translateY(-50%) scale(1.1);
-}
-
-.strip-arrow.prev { left: 8px; }
-.strip-arrow.next { right: 8px; }
 
 /* ==========================================================================
    BANNER PARALLAX INTERMEDIO (ESTética Clara & Pastel)
@@ -1921,9 +1932,44 @@ img {
         max-width: 265px;
         border-radius: 14px;
     }
+
+    .brands-kinetic-section {
+        padding: 3.5rem 0 3rem;
+    }
+
+    .brands-marquee-wrapper::before,
+    .brands-marquee-wrapper::after {
+        width: 24px;
+    }
+
+    .brands-scroll-strip {
+        gap: 0.85rem;
+        padding: 0.6rem 1rem 1.35rem;
+    }
+
+    .brand-glass-card {
+        width: 170px;
+        min-width: 170px;
+        max-width: 170px;
+        border-radius: 14px;
+        padding: 4px;
+    }
 }
 
 @media (max-width: 480px) {
+    .brands-marquee-wrapper::before,
+    .brands-marquee-wrapper::after {
+        display: none;
+    }
+
+    .brand-glass-card {
+        width: 152px;
+        min-width: 152px;
+        max-width: 152px;
+        border-radius: 12px;
+        padding: 3px;
+    }
+
     .reviews-marquee-wrapper::before,
     .reviews-marquee-wrapper::after {
         display: none;
